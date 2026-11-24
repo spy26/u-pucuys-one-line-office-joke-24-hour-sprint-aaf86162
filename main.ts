@@ -24,7 +24,15 @@ if (chars.length < 1 || chars.length > 200 || JOKE.trim().length === 0) {
 if (JOKE !== JOKE.trim() || JOKE.includes("\n")) {
   throw new Error("entry must be a single line with no surrounding whitespace");
 }
-if ([...JOKE].filter((c) => c === ".").length !== 1) {
+// One sentence: exactly one sentence terminator in the whole joke, and it
+// is the final character — a second sentence, or an abbreviation such as
+// "e.g." smuggled into the setup, both fail loudly here. Counting bare
+// periods alone would miss "!" and "?" endings and would miscount
+// abbreviations, so the check looks at every terminator, not just ".".
+const terminators = [...JOKE].filter(
+  (c) => c === "." || c === "!" || c === "?",
+);
+if (terminators.length !== 1 || !JOKE.endsWith(terminators[0])) {
   throw new Error("entry must be exactly one sentence");
 }
 
